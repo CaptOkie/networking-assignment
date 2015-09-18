@@ -20,7 +20,7 @@ $ git clone git@github.com:CaptOkie/networking-assignment.git
 7. OK > Next > Finish
 8. Repeat 1 - 7 for *networking-assignment/client* and *networking-assignment/server*
 
-### Step 3 - Update Build Paths
+### Step 3 - Update Build Paths (For Eclipse)
 
 1. *Right Click* on the *client* project
 2. Select *Properties*
