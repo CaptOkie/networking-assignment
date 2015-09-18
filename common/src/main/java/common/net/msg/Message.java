@@ -25,7 +25,7 @@ public class Message implements Serializable {
         return instruction;
     }
     
-    public void setInstruction(Instruction instruction) {
+    public void setInstruction(final Instruction instruction) {
         this.instruction = instruction;
     }
     
