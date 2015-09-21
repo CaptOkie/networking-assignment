@@ -11,7 +11,7 @@ import client.ui.Command;
 import client.ui.CommandLineInterface;
 import client.ui.Operation;
 import common.net.msg.Instruction;
-import common.net.msg.Message;
+import common.net.msg.Request;
 
 public class Main {
 
@@ -29,7 +29,7 @@ public class Main {
                 Optional<Command> command;
                 for (command = ui.getCommand(); !command.isPresent(); command = ui.getCommand()) {}
 
-                final Optional<Message> message = command2Message(command.get());
+                final Optional<Request> message = command2Message(command.get());
                 if (message.isPresent()) {
                     outputStream.writeObject(message.get());
                 }
@@ -37,11 +37,11 @@ public class Main {
         }
     }
 
-    private static Optional<Message> command2Message(final Command command) {
+    private static Optional<Request> command2Message(final Command command) {
 
         final Optional<Instruction> instruction = operation2Instruction(command.getOperation());
         if (instruction.isPresent()) {
-            return Optional.of(new Message(instruction.get(), command.getData()));
+            return Optional.of(new Request(instruction.get(), command.getData()));
         }
 
         return Optional.empty();

@@ -6,7 +6,7 @@ import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-import common.net.msg.Message;
+import common.net.msg.Request;
 
 public class Main {
 
@@ -17,7 +17,7 @@ public class Main {
                 final ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream())) {
             
             while (true) {
-                final Message message = (Message) inputStream.readObject();
+                final Request message = (Request) inputStream.readObject();
                 System.err.println("Instruction: " + message.getInstruction() + "Data: " + message.getData());
             }
         }
