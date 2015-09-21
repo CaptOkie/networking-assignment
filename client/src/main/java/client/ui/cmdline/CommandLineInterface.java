@@ -1,9 +1,10 @@
-package client.ui;
+package client.ui.cmdline;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import client.ui.Operation;
 import common.ui.Console;
 
 public class CommandLineInterface {
@@ -32,5 +33,10 @@ public class CommandLineInterface {
         catch (final IllegalArgumentException e) {
             return Optional.empty();
         }
+    }
+    
+    public CommandLineInterface writeError(final CommandLineError error) {
+        console.writeLine(error.getMsg());
+        return this;
     }
 }

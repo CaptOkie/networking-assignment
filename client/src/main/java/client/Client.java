@@ -7,13 +7,12 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Optional;
 
-import client.ui.Command;
-import client.ui.CommandLineInterface;
-import client.ui.Operation;
-import common.net.msg.Instruction;
+import client.ui.cmdline.Command;
+import client.ui.cmdline.CommandLineError;
+import client.ui.cmdline.CommandLineInterface;
 import common.net.msg.Request;
 
-public class Main {
+public class Client {
 
     public static void main(final String[] args) throws UnknownHostException, IOException, ClassNotFoundException {
 
@@ -27,41 +26,18 @@ public class Main {
             while (true) {
 
                 Optional<Command> command;
-                for (command = ui.getCommand(); !command.isPresent(); command = ui.getCommand()) {}
+                for (command = ui.getCommand(); !command.isPresent(); command = ui.getCommand()) {
+                    ui.writeError(CommandLineError.UNRECOGNIZED_COMMAND);
+                }
 
-                final Optional<Request> message = command2Message(command.get());
+                final Optional<Request> message = command.get().toRequest();
                 if (message.isPresent()) {
                     outputStream.writeObject(message.get());
                 }
+                else {
+                    // TODO
+                }
             }
-        }
-    }
-
-    private static Optional<Request> command2Message(final Command command) {
-
-        final Optional<Instruction> instruction = operation2Instruction(command.getOperation());
-        if (instruction.isPresent()) {
-            return Optional.of(new Request(instruction.get(), command.getData()));
-        }
-
-        return Optional.empty();
-    }
-
-    private static Optional<Instruction> operation2Instruction(final Operation operation) {
-
-        switch (operation) {
-            case CD:
-                return Optional.of(Instruction.CD);
-            case GET: 
-                return Optional.of(Instruction.GET);
-            case LS:
-                return Optional.of(Instruction.LS);
-            case MKDIR:
-                return Optional.of(Instruction.MKDIR);
-            case PUT:
-                return Optional.of(Instruction.PUT);
-            default:
-                return Optional.empty();
         }
     }
 }

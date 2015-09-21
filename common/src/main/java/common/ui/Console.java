@@ -8,13 +8,14 @@ public class Console implements AutoCloseable {
     private final Formatter formatter;
     private final Scanner scanner;
     
-    public String readLine(final String str) {
-        formatter.format(str).flush();
+    public String readLine(final String string) {
+        formatter.format(string).flush();
         return scanner.nextLine();
     }
     
-    public void writeLine(final String str) {
-        formatter.format(str).flush();
+    public Console writeLine(final String string) {
+        formatter.format(string + "\n").flush();
+        return this;
     }
     
     public Console() {

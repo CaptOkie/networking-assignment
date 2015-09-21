@@ -8,7 +8,7 @@ import java.net.Socket;
 
 import common.net.msg.Request;
 
-public class Main {
+public class Server {
 
     public static void main(final String[] args) throws IOException, ClassNotFoundException {
         
@@ -18,7 +18,7 @@ public class Main {
             
             while (true) {
                 final Request message = (Request) inputStream.readObject();
-                System.err.println("Instruction: " + message.getInstruction() + "Data: " + message.getData());
+                System.err.println("Instruction: " + message.getInstruction() + ", Data: " + message.getData());
             }
         }
     }
