@@ -1,6 +1,7 @@
 package common.ui;
 
 import java.util.Formatter;
+import java.util.List;
 import java.util.Scanner;
 
 public class Console implements AutoCloseable {
@@ -8,14 +9,18 @@ public class Console implements AutoCloseable {
     private final Formatter formatter;
     private final Scanner scanner;
     
-    public String readLine(final String string) {
-        formatter.format(string).flush();
+    public String readLine(final String prompt) {
+        formatter.format(prompt).flush();
         return scanner.nextLine();
     }
     
-    public Console writeLine(final String string) {
-        formatter.format(string + "\n").flush();
+    public Console writeLine(final String line) {
+        formatter.format(line + System.lineSeparator()).flush();
         return this;
+    }
+    
+    public Console writeLines(final List<? extends String> lines) {
+        return writeLine(String.join(System.lineSeparator(), lines));
     }
     
     public Console() {

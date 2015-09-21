@@ -10,7 +10,7 @@ import common.net.msg.Request;
 
 public class Server {
 
-    public static void main(final String[] args) throws IOException, ClassNotFoundException {
+    public static void main(final String[] args) throws IOException, ClassNotFoundException { // TODO Maybe handle these exceptions
         
         System.out.println("Listening");
         try (final ServerSocket serverSocket = new ServerSocket(8080); final Socket socket = serverSocket.accept(); final ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());

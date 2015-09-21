@@ -3,6 +3,7 @@ package client.ui.cmdline;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import client.ui.Operation;
 import common.ui.Console;
@@ -35,8 +36,13 @@ public class CommandLineInterface {
         }
     }
     
-    public CommandLineInterface writeError(final CommandLineError error) {
+    public CommandLineInterface showError(final CommandLineError error) {
         console.writeLine(error.getMsg());
+        return this;
+    }
+    
+    public CommandLineInterface showHelp() {
+        console.writeLines(Arrays.stream(Operation.values()).map(operation -> operation + ": " + operation.getDesc()).collect(Collectors.toList()));
         return this;
     }
 }

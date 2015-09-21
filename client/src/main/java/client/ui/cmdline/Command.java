@@ -35,13 +35,13 @@ public class Command {
         return data;
     }
     
-    public Optional<Request> toRequest() {
+    public Request toRequest() {
         final Optional<Instruction> instruction = operation2Instruction(getOperation());
         if (instruction.isPresent()) {
-            return Optional.of(new Request(instruction.get(), getData()));
+            return new Request(instruction.get(), getData());
         }
 
-        return Optional.empty();
+        throw new CommandToRequestException("Cannot convert with the Operation " + getOperation());
     }
     
     private static Optional<Instruction> operation2Instruction(final Operation operation) {

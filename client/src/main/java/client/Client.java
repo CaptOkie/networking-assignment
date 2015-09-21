@@ -10,11 +10,10 @@ import java.util.Optional;
 import client.ui.cmdline.Command;
 import client.ui.cmdline.CommandLineError;
 import client.ui.cmdline.CommandLineInterface;
-import common.net.msg.Request;
 
 public class Client {
 
-    public static void main(final String[] args) throws UnknownHostException, IOException, ClassNotFoundException {
+    public static void main(final String[] args) throws UnknownHostException, IOException, ClassNotFoundException { // TODO Maybe handle these exceptions
 
         final CommandLineInterface ui = new CommandLineInterface();
 
@@ -27,15 +26,18 @@ public class Client {
 
                 Optional<Command> command;
                 for (command = ui.getCommand(); !command.isPresent(); command = ui.getCommand()) {
-                    ui.writeError(CommandLineError.UNRECOGNIZED_COMMAND);
+                    ui.showError(CommandLineError.UNRECOGNIZED_COMMAND);
                 }
 
-                final Optional<Request> message = command.get().toRequest();
-                if (message.isPresent()) {
-                    outputStream.writeObject(message.get());
-                }
-                else {
-                    // TODO
+                switch (command.get().getOperation()) {
+                    case HELP:
+                        ui.showHelp();
+                        break;
+                    case PWD:
+                        break;
+                    default:
+                        outputStream.writeObject(command.get().toRequest());
+                        break;
                 }
             }
         }
