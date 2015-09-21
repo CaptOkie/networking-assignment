@@ -5,6 +5,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Optional;
 
 import client.ui.cmdline.Command;
@@ -22,6 +24,7 @@ public class Client {
                 final ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());
                 final ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream())) {
 
+            Path path = Paths.get((String) inputStream.readObject());
             while (true) {
 
                 Optional<Command> command;
@@ -34,9 +37,10 @@ public class Client {
                         ui.showHelp();
                         break;
                     case PWD:
+                        ui.showPath(path);
                         break;
                     default:
-                        outputStream.writeObject(command.get().toRequest());
+                        outputStream.writeObject(command.get().toRequest(path));
                         break;
                 }
             }

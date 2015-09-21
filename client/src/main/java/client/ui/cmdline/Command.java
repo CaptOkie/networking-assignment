@@ -1,5 +1,6 @@
 package client.ui.cmdline;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -35,10 +36,10 @@ public class Command {
         return data;
     }
     
-    public Request toRequest() {
+    public Request toRequest(final Path path) {
         final Optional<Instruction> instruction = operation2Instruction(getOperation());
         if (instruction.isPresent()) {
-            return new Request(instruction.get(), getData());
+            return new Request(path, instruction.get(), getData());
         }
 
         throw new CommandToRequestException("Cannot convert with the Operation " + getOperation());

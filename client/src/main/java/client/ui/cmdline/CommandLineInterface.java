@@ -1,5 +1,6 @@
 package client.ui.cmdline;
 
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -43,6 +44,11 @@ public class CommandLineInterface {
     
     public CommandLineInterface showHelp() {
         console.writeLines(Arrays.stream(Operation.values()).map(operation -> operation + ": " + operation.getDesc()).collect(Collectors.toList()));
+        return this;
+    }
+    
+    public CommandLineInterface showPath(final Path path) {
+        console.writeLine(path.toString());
         return this;
     }
 }
