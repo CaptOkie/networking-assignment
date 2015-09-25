@@ -29,7 +29,7 @@ public class Console implements AutoCloseable {
     }
     
     @Override
-    public void close() throws Exception {
+    public void close() {
         formatter.close();
         scanner.close();
     }

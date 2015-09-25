@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 import client.ui.Operation;
 import common.ui.Console;
 
-public class CommandLineInterface {
+public class CommandLineInterface implements AutoCloseable {
 
     private final Console console;
     
@@ -50,5 +50,15 @@ public class CommandLineInterface {
     public CommandLineInterface showPath(final Path path) {
         console.writeLine(path.toString());
         return this;
+    }
+    
+    public CommandLineInterface showFiles(final List<String> files) {
+        console.writeLines(files);
+        return this;
+    }
+
+    @Override
+    public void close() {
+        console.close();
     }
 }
