@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.Optional;
 
 import client.ui.Operation;
-import common.net.msg.Instruction;
-import common.net.msg.Request;
+import common.msg.Instruction;
+import common.msg.Request;
 
 public class Command {
 

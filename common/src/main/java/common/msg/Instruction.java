@@ -1,4 +1,4 @@
-package common.net.msg;
+package common.msg;
 
 public enum Instruction {
     LS,

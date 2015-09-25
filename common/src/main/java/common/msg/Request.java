@@ -1,4 +1,4 @@
-package common.net.msg;
+package common.msg;
 
 import java.io.Serializable;
 import java.nio.file.Path;

@@ -12,6 +12,7 @@ import java.util.Optional;
 import client.ui.cmdline.Command;
 import client.ui.cmdline.CommandLineError;
 import client.ui.cmdline.CommandLineInterface;
+import common.msg.Request;
 
 public class Client {
 
@@ -40,10 +41,27 @@ public class Client {
                         ui.showPath(path);
                         break;
                     default:
-                        outputStream.writeObject(command.get().toRequest(path));
+                        send(command.get().toRequest(path), outputStream);
                         break;
                 }
             }
+        }
+    }
+    
+    private static void send(final Request request, final ObjectOutputStream outputStream) throws IOException {
+        
+        outputStream.writeObject(request);
+        switch (request.getInstruction()) {
+            case CD:
+                break;
+            case GET:
+                break;
+            case LS:
+                break;
+            case MKDIR:
+                break;
+            case PUT:
+                break;
         }
     }
 }
