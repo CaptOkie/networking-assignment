@@ -6,10 +6,10 @@ import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.file.Files;
-import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import common.msg.Request;
 import common.msg.response.FileList;
@@ -33,13 +33,13 @@ public class Controller implements AutoCloseable {
 
                 switch (request.getInstruction()) {
                     case CD:
-                        outputStream.writeObject(changePath(request)); // TODO
+                        outputStream.writeObject(changePath(request));
                         break;
                     case GET:
                         // TODO
                         break;
                     case LS:
-                        outputStream.writeObject(new FileList(Arrays.asList(".", "..", "Blah", "Test"))); // TODO
+                        outputStream.writeObject(getFileList(request));
                         break;
                     case MKDIR:
                         // TODO
@@ -66,11 +66,25 @@ public class Controller implements AutoCloseable {
             return new PathChange(parent);
         }
 
-        final String toResolve = Files.walk(request.getPath(), 1).filter(file -> Files.isDirectory(file) && file.getFileName().toString().equals(request.getData().get(0)))
+        final String toResolve = Files.walk(path, 1).filter(file -> Files.isDirectory(file) && file.getFileName().toString().equals(request.getData().get(0)))
                 .map(file -> file.getFileName().toString()).findFirst().orElse("");
         return new PathChange(path.resolve(toResolve));
     }
 
+    private FileList getFileList(final Request request) throws IOException {
+        
+        final Path path = request.getPath();
+        
+        final List<String> files = Files.walk(path, 1).map(file -> {
+            final String name = file.getFileName().toString();
+            if (Files.isDirectory(file)) {
+                return name + "/";
+            }
+            return name;
+        }).collect(Collectors.toList());
+        return new FileList(files);
+    }
+    
     @Override
     public void close() {}
 }

@@ -1,7 +1,7 @@
 package common.ui;
 
+import java.util.Collection;
 import java.util.Formatter;
-import java.util.List;
 import java.util.Scanner;
 
 public class Console implements AutoCloseable {
@@ -19,7 +19,7 @@ public class Console implements AutoCloseable {
         return this;
     }
     
-    public Console writeLines(final List<? extends String> lines) {
+    public Console writeLines(final Collection<? extends String> lines) {
         return writeLine(String.join(System.lineSeparator(), lines));
     }
     

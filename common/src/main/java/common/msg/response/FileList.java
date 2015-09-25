@@ -1,20 +1,24 @@
 package common.msg.response;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 public class FileList implements Serializable {
 
     private static final long serialVersionUID = 6453926456793760349L;
     
-    private List<String> files;
+    private SortedSet<String> files;
     
     public FileList(final List<? extends String> files) {
-        this.files = new ArrayList<>(files);
+        this.files = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
+        this.files.add(".");
+        this.files.add("..");
+        this.files.addAll(files);
     }
     
-    public List<String> getFiles() {
+    public SortedSet<String> getFiles() {
         return files;
     }
 }

@@ -2,6 +2,7 @@ package client.ui.cmdline;
 
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -52,7 +53,7 @@ public class CommandLineInterface implements AutoCloseable {
         return this;
     }
     
-    public CommandLineInterface showFiles(final List<String> files) {
+    public CommandLineInterface showFiles(final Collection<String> files) {
         console.writeLines(files);
         return this;
     }
