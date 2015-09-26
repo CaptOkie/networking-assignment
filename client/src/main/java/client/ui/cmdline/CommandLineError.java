@@ -1,7 +1,8 @@
 package client.ui.cmdline;
 
 public enum CommandLineError {
-    UNRECOGNIZED_COMMAND("Unrecognized Command");
+    UNRECOGNIZED_COMMAND("Unrecognized command"),
+    MAKE_DIR_FAILED("Unable to create the directory");
 
     private final String msg;
 

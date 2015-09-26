@@ -53,7 +53,7 @@ public class CommandLineInterface implements AutoCloseable {
         return this;
     }
     
-    public CommandLineInterface showFiles(final Collection<String> files) {
+    public CommandLineInterface showFiles(final Collection<? extends String> files) {
         console.writeLines(files);
         return this;
     }

@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 
 import common.msg.Request;
 import common.msg.response.FileList;
+import common.msg.response.MakeDirectory;
 import common.msg.response.PathChange;
 
 public class Controller implements AutoCloseable {
@@ -42,7 +43,7 @@ public class Controller implements AutoCloseable {
                         outputStream.writeObject(getFileList(request));
                         break;
                     case MKDIR:
-                        // TODO
+                        outputStream.writeObject(makeDirectory(request));
                         break;
                     case PUT:
                         // TODO
@@ -66,25 +67,44 @@ public class Controller implements AutoCloseable {
             return new PathChange(parent);
         }
 
-        final String toResolve = Files.walk(path, 1).filter(file -> Files.isDirectory(file) && file.getFileName().toString().equals(request.getData().get(0)))
+        final String toResolve = Files.list(path).filter(file -> file.getFileName().toString().equals(request.getData().get(0)) && Files.isDirectory(file))
                 .map(file -> file.getFileName().toString()).findFirst().orElse("");
+
         return new PathChange(path.resolve(toResolve));
     }
 
     private FileList getFileList(final Request request) throws IOException {
-        
+
         final Path path = request.getPath();
-        
-        final List<String> files = Files.walk(path, 1).map(file -> {
+
+        final List<String> files = Files.list(path).map(file -> {
             final String name = file.getFileName().toString();
             if (Files.isDirectory(file)) {
                 return name + "/";
             }
             return name;
         }).collect(Collectors.toList());
+
         return new FileList(files);
     }
-    
+
+    private MakeDirectory makeDirectory(final Request request) {
+        
+        final Path path = request.getPath();
+        
+        if (request.getData().isEmpty()) {
+            return new MakeDirectory(false);
+        }
+
+        try {
+            Files.createDirectory(path.resolve(request.getData().get(0)));
+            return new MakeDirectory(true);
+        }
+        catch (IOException e) {
+            return new MakeDirectory(false);
+        }
+    }
+
     @Override
     public void close() {}
 }

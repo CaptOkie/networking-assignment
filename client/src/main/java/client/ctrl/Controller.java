@@ -13,6 +13,7 @@ import client.ui.cmdline.CommandLineError;
 import client.ui.cmdline.CommandLineInterface;
 import common.msg.Request;
 import common.msg.response.FileList;
+import common.msg.response.MakeDirectory;
 import common.msg.response.PathChange;
 
 public class Controller implements AutoCloseable {
@@ -73,7 +74,10 @@ public class Controller implements AutoCloseable {
                 ui.showFiles(fileList.getFiles());
                 break;
             case MKDIR:
-                // TODO
+                final MakeDirectory makeDirectory = (MakeDirectory) inputStream.readObject();
+                if (!makeDirectory.isSuccess()) {
+                    ui.showError(CommandLineError.MAKE_DIR_FAILED);
+                }
                 break;
             case PUT:
                 // TODO
