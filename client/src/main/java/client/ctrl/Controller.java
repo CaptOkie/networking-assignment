@@ -6,7 +6,6 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.nio.file.Path;
-import java.util.Optional;
 
 import client.ui.cmdline.Command;
 import client.ui.cmdline.CommandLineError;
@@ -38,12 +37,12 @@ public class Controller implements AutoCloseable {
         path = ((PathChange) inputStream.readObject()).getPath();
         while (true) {
 
-            Optional<Command> command;
-            for (command = ui.getCommand(); !command.isPresent(); command = ui.getCommand()) {
+            Command command;
+            for (command = ui.getCommand(); command == null; command = ui.getCommand()) {
                 ui.showError(CommandLineError.UNRECOGNIZED_COMMAND);
             }
 
-            switch (command.get().getOperation()) {
+            switch (command.getOperation()) {
                 case HELP:
                     ui.showHelp();
                     break;
@@ -51,7 +50,7 @@ public class Controller implements AutoCloseable {
                     ui.showPath(path);
                     break;
                 default:
-                    send(command.get().toRequest(path), outputStream, inputStream);
+                    send(command.toRequest(path), outputStream, inputStream);
                     break;
             }
         }

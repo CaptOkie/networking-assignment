@@ -1,21 +1,29 @@
 package client.ui;
 
+import common.msg.Instruction;
+
 public enum Operation {
-    LS("List all files in the directory."),
-    GET("Get the file."),
-    PUT("Put the file."),
-    CD("Change directories."),
-    MKDIR("Create a directory."),
-    PWD("Show the current directory path."),
-    HELP("Show help instructions.");
+    LS("List all files in the directory.", Instruction.LS),
+    GET("Get the file.", Instruction.GET),
+    PUT("Put the file.", Instruction.PUT),
+    CD("Change directories.", Instruction.CD),
+    MKDIR("Create a directory.", Instruction.MKDIR),
+    PWD("Show the current directory path.", null),
+    HELP("Show help instructions.", null);
 
     private final String desc;
+    private final Instruction instruction;
     
-    private Operation(final String desc) {
+    private Operation(final String desc, final Instruction instruction) {
         this.desc = desc;
+        this.instruction = instruction;
     }
     
     public String getDesc() {
         return desc;
+    }
+    
+    public Instruction getInstruction() {
+        return instruction;
     }
 }

@@ -4,10 +4,8 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 import client.ui.Operation;
-import common.msg.Instruction;
 import common.msg.Request;
 
 public class Command {
@@ -16,7 +14,7 @@ public class Command {
     private List<String> data;
     
     public Command(final Operation operation) {
-        this(operation, Collections.emptyList());
+        this(operation, Collections.<String> emptyList());
     }
     
     public Command(final Operation operation, final List<? extends String> data) {
@@ -37,29 +35,10 @@ public class Command {
     }
     
     public Request toRequest(final Path path) {
-        final Optional<Instruction> instruction = operation2Instruction(getOperation());
-        if (instruction.isPresent()) {
-            return new Request(path, instruction.get(), getData());
+        if (getOperation().getInstruction() != null) {
+            return new Request(path, getOperation().getInstruction(), getData());
         }
 
         throw new CommandToRequestException("Cannot convert with the Operation " + getOperation());
-    }
-    
-    private static Optional<Instruction> operation2Instruction(final Operation operation) {
-
-        switch (operation) {
-            case CD:
-                return Optional.of(Instruction.CD);
-            case GET: 
-                return Optional.of(Instruction.GET);
-            case LS:
-                return Optional.of(Instruction.LS);
-            case MKDIR:
-                return Optional.of(Instruction.MKDIR);
-            case PUT:
-                return Optional.of(Instruction.PUT);
-            default:
-                return Optional.empty();
-        }
     }
 }

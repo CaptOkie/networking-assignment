@@ -8,8 +8,8 @@ import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import common.msg.Request;
 import common.msg.response.FileList;
@@ -70,14 +70,10 @@ public class Controller implements AutoCloseable {
     private FileList getFileList(final Request request) throws IOException {
 
         final Path path = request.getPath();
-
-        final List<String> files = Files.list(path).map(file -> {
-            final String name = file.getFileName().toString();
-            if (Files.isDirectory(file)) {
-                return name + "/";
-            }
-            return name;
-        }).collect(Collectors.toList());
+        final List<String> files = new ArrayList<>();
+        for (final Path file : Files.newDirectoryStream(path)) {
+            files.add(file.getFileName() + (Files.isDirectory(file) ? "/" : ""));
+        }
 
         return new FileList(files);
     }

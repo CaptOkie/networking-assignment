@@ -1,7 +1,7 @@
 # networking-assignment
 
 ## Setup
-Development done in Java 8.
+Development done in Java 7.
 
 ### Step 1 - Obtain Source
 

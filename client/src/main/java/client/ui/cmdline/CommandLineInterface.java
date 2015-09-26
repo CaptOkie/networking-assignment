@@ -1,11 +1,10 @@
 package client.ui.cmdline;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 import client.ui.Operation;
 import common.ui.Console;
@@ -18,23 +17,23 @@ public class CommandLineInterface implements AutoCloseable {
         this.console = new Console();
     }
     
-    public Optional<Command> getCommand() {
+    public Command getCommand() {
         
         final String line = console.readLine("> ");
         if (line == null) {
-            return Optional.empty();
+            return null;
         }
         
         final List<String> items = Arrays.asList(line.split("\\s+"));
         if (items.size() <= 0) {
-            return Optional.empty();
+            return null;
         }
         
         try {
-            return Optional.of(new Command(Operation.valueOf(items.get(0).toUpperCase()), items.subList(1, items.size())));
+            return new Command(Operation.valueOf(items.get(0).toUpperCase()), items.subList(1, items.size()));
         }
         catch (final IllegalArgumentException e) {
-            return Optional.empty();
+            return null;
         }
     }
     
@@ -44,7 +43,13 @@ public class CommandLineInterface implements AutoCloseable {
     }
     
     public CommandLineInterface showHelp() {
-        console.writeLines(Arrays.stream(Operation.values()).map(operation -> operation + ": " + operation.getDesc()).collect(Collectors.toList()));
+        
+        final List<String> lines = new ArrayList<>();
+        for (final Operation operation : Operation.values()) {
+            lines.add(operation + ": " + operation.getDesc());
+        }
+        
+        console.writeLines(lines);
         return this;
     }
     

@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.Formatter;
 import java.util.Scanner;
 
+import common.utils.StringUtils;
+
 public class Console implements AutoCloseable {
 
     private final Formatter formatter;
@@ -20,7 +22,8 @@ public class Console implements AutoCloseable {
     }
     
     public Console writeLines(final Collection<? extends String> lines) {
-        return writeLine(String.join(System.lineSeparator(), lines));
+        
+        return writeLine(StringUtils.join(System.lineSeparator(), lines));
     }
     
     public Console() {

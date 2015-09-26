@@ -16,7 +16,7 @@ public class Request implements Serializable {
     private List<String> data;
     
     public Request(final Path path, final Instruction instruction) {
-        this(path, instruction, Collections.emptyList());
+        this(path, instruction, Collections.<String> emptyList());
     }
     
     public Request(final Path path, final Instruction instruction, final List<? extends String> data) {
