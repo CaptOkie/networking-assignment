@@ -56,21 +56,15 @@ public class Controller implements AutoCloseable {
     private PathChange changePath(final Request request) throws IOException {
 
         final Path path = request.getPath();
-        if (request.getData().isEmpty() || request.getData().get(0).equals(".")) {
+        if (request.getData().isEmpty()) {
             return new PathChange(path);
         }
-        else if (request.getData().get(0).equals("..")) {
-            final Path parent = path.getParent();
-            if (parent == null) {
-                return new PathChange(path);
-            }
-            return new PathChange(parent);
+
+        final Path newPath = path.resolve(request.getData().get(0)).normalize();
+        if (Files.isDirectory(newPath)) {
+            return new PathChange(newPath);
         }
-
-        final String toResolve = Files.list(path).filter(file -> file.getFileName().toString().equals(request.getData().get(0)) && Files.isDirectory(file))
-                .map(file -> file.getFileName().toString()).findFirst().orElse("");
-
-        return new PathChange(path.resolve(toResolve));
+        return new PathChange(path);
     }
 
     private FileList getFileList(final Request request) throws IOException {
