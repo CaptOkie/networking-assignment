@@ -6,14 +6,18 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import client.ui.cmdline.Command;
 import client.ui.cmdline.CommandLineError;
 import client.ui.cmdline.CommandLineInterface;
+
 import common.msg.Request;
 import common.msg.response.FileList;
 import common.msg.response.MakeDirectory;
 import common.msg.response.PathChange;
+import common.msg.response.PutStatus;
+import common.tcp.FileTransfer;
 
 public class Controller implements AutoCloseable {
 
@@ -21,6 +25,7 @@ public class Controller implements AutoCloseable {
     private final Socket socket;
     private final ObjectOutputStream outputStream;
     private final ObjectInputStream inputStream;
+    private final FileTransfer fileTransfer;
     
     private Path path;
     
@@ -29,6 +34,8 @@ public class Controller implements AutoCloseable {
         this.socket = new Socket("127.0.0.1", 8080);
         this.outputStream = new ObjectOutputStream(socket.getOutputStream());
         this.inputStream = new ObjectInputStream(socket.getInputStream());
+        this.fileTransfer = new FileTransfer();        
+
         this.path = null;
     }
     
@@ -79,7 +86,20 @@ public class Controller implements AutoCloseable {
                 }
                 break;
             case PUT:
-                // TODO
+                if (!request.getData().isEmpty()) {
+                    fileTransfer.send(Paths.get(request.getData().get(0)), socket.getOutputStream());
+                }
+                final PutStatus putStatus = (PutStatus) inputStream.readObject();
+                switch(putStatus) {
+                    case NO_PATH:
+                        ui.showError(CommandLineError.ARGUMENT_MISSING);
+                        break;
+                    case FAIL:
+                        ui.showError(CommandLineError.UPLOAD_FAILED);
+                        break;
+                    case SUCCESS:
+                        break;
+                }
                 break;
         }
     }
