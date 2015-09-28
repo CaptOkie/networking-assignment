@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -16,6 +17,7 @@ import java.util.List;
 
 import common.msg.Request;
 import common.msg.response.FileList;
+import common.msg.response.GetStatus;
 import common.msg.response.MakeDirectory;
 import common.msg.response.PathChange;
 import common.msg.response.PutStatus;
@@ -45,21 +47,21 @@ public class Controller implements AutoCloseable {
                 System.err.println("Instruction: " + request.getInstruction() + ", Data: " + request.getData());
 
                 switch (request.getInstruction()) {
-                case CD:
-                    outputStream.writeObject(changePath(request));
-                    break;
-                case GET:
-                    // TODO
-                    break;
-                case LS:
-                    outputStream.writeObject(getFileList(request));
-                    break;
-                case MKDIR:
-                    outputStream.writeObject(makeDirectory(request));
-                    break;
-                case PUT:
-                    outputStream.writeObject(putFile(request, socket.getInputStream()));
-                    break;
+                    case CD:
+                        outputStream.writeObject(changePath(request));
+                        break;
+                    case GET:
+                        outputStream.writeObject(getFile(request, socket.getOutputStream()));
+                        break;
+                    case LS:
+                        outputStream.writeObject(getFileList(request));
+                        break;
+                    case MKDIR:
+                        outputStream.writeObject(makeDirectory(request));
+                        break;
+                    case PUT:
+                        outputStream.writeObject(putFile(request, socket.getInputStream()));
+                        break;
                 }
             }
         }
@@ -101,19 +103,28 @@ public class Controller implements AutoCloseable {
         try {
             Files.createDirectory(path.resolve(request.getData().get(0)));
             return new MakeDirectory(true);
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             return new MakeDirectory(false);
         }
     }
 
-    private PutStatus putFile(final Request request, InputStream inputStream) throws UnsupportedEncodingException, ClassNotFoundException,
-            IOException {
+    private PutStatus putFile(final Request request, InputStream inputStream) throws UnsupportedEncodingException, ClassNotFoundException, IOException {
         if (request.getData().isEmpty()) {
             return PutStatus.NO_PATH;
         }
-        
+
         fileTransfer.receive(request.getPath().resolve(Paths.get(request.getData().get(0)).getFileName()), inputStream);
         return PutStatus.SUCCESS;
+    }
+
+    private GetStatus getFile(final Request request, final OutputStream outputStream) throws IOException {
+        if (request.getData().isEmpty()) {
+            return GetStatus.NO_PATH;
+        }
+
+        fileTransfer.send(request.getPath().resolve(request.getData().get(0)), outputStream);
+        return GetStatus.SUCCESS;
     }
 
     @Override

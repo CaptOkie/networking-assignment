@@ -5,6 +5,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -14,6 +15,7 @@ import client.ui.cmdline.CommandLineInterface;
 
 import common.msg.Request;
 import common.msg.response.FileList;
+import common.msg.response.GetStatus;
 import common.msg.response.MakeDirectory;
 import common.msg.response.PathChange;
 import common.msg.response.PutStatus;
@@ -21,6 +23,8 @@ import common.tcp.FileTransfer;
 
 public class Controller implements AutoCloseable {
 
+    private static final String USER_HOME = "user.home";
+    
     private final CommandLineInterface ui;
     private final Socket socket;
     private final ObjectOutputStream outputStream;
@@ -28,6 +32,7 @@ public class Controller implements AutoCloseable {
     private final FileTransfer fileTransfer;
     
     private Path path;
+    private Path getDir;
     
     public Controller() throws UnknownHostException, IOException {
         this.ui = new CommandLineInterface();
@@ -37,6 +42,7 @@ public class Controller implements AutoCloseable {
         this.fileTransfer = new FileTransfer();        
 
         this.path = null;
+        this.getDir = Paths.get(System.getProperty(USER_HOME));
     }
     
     public void run() throws ClassNotFoundException, IOException {
@@ -56,6 +62,15 @@ public class Controller implements AutoCloseable {
                 case PWD:
                     ui.showPath(path);
                     break;
+                case GETDIR:
+                    if (!command.getData().isEmpty()) {
+                        final Path change = getDir.resolve(command.getData().get(0));
+                        if (Files.isDirectory(getDir)) {
+                            getDir = change;
+                        }
+                    }
+                    ui.showPath(getDir);
+                    break;
                 default:
                     send(command.toRequest(path), outputStream, inputStream);
                     break;
@@ -73,7 +88,17 @@ public class Controller implements AutoCloseable {
                 ui.showPath(path);
                 break;
             case GET:
-                // TODO
+                if (!request.getData().isEmpty()) {
+                    fileTransfer.receive(getDir.resolve(Paths.get(request.getData().get(0))), socket.getInputStream());
+                }
+                final GetStatus getStatus = (GetStatus) inputStream.readObject();
+                switch (getStatus) {
+                    case NO_PATH:
+                        ui.showError(CommandLineError.ARGUMENT_MISSING);
+                        break;
+                    case SUCCESS:
+                        break;
+                }
                 break;
             case LS:
                 final FileList fileList = (FileList) inputStream.readObject();

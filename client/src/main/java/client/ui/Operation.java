@@ -8,6 +8,7 @@ public enum Operation {
     PUT("Put the file.", Instruction.PUT),
     CD("Change directories.", Instruction.CD),
     MKDIR("Create a directory.", Instruction.MKDIR),
+    GETDIR("Prints or sets the directory to download to.", null),
     PWD("Show the current directory path.", null),
     HELP("Show help instructions.", null);
 
