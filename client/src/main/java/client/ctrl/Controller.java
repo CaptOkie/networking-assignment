@@ -51,6 +51,7 @@ public class Controller implements AutoCloseable {
         boolean run = true;
         System.out.println("Connection Successful");
         path = ((PathChange) inputStream.readObject()).getPath();
+        System.out.println("Current Directory: " +path.toString());
         while (run) {
 
             Command command;

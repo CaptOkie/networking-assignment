@@ -38,37 +38,53 @@ public class Controller implements AutoCloseable {
     public void run() throws IOException, ClassNotFoundException {
 
         boolean run = true;
+        boolean connected;
+        Socket socket;
+        ObjectOutputStream outputStream;
+        ObjectInputStream inputStream;
 
-        try (final Socket socket = serverSocket.accept();
-                final ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());
-                final ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream())) {
+        while(run) {
+            try {
+                socket = serverSocket.accept();
+                outputStream = new ObjectOutputStream(socket.getOutputStream());
+                inputStream = new ObjectInputStream(socket.getInputStream());
+                connected = true;
 
-            outputStream.writeObject(new PathChange(Paths.get(System.getProperty(USER_HOME))));
-            while (run) {
-                final Request request = (Request) inputStream.readObject();
-                System.err.println("Instruction: " + request.getInstruction() + ", Data: " + request.getData()); //TODO: Why is this an error?
+                System.out.println("Client Connected");
+                outputStream.writeObject(new PathChange(Paths.get(System.getProperty(USER_HOME))));
+                while (connected) {
+                    final Request request = (Request) inputStream.readObject();
+//                    System.out.println("Instruction: " + request.getInstruction() + ", Data: " + request.getData());
 
-                switch (request.getInstruction()) {
-                    case CD:
-                        outputStream.writeObject(changePath(request));
-                        break;
-                    case GET:
-                        outputStream.writeObject(getFile(request, socket.getOutputStream()));
-                        break;
-                    case LS:
-                        outputStream.writeObject(getFileList(request));
-                        break;
-                    case MKDIR:
-                        outputStream.writeObject(makeDirectory(request));
-                        break;
-                    case PUT:
-                        outputStream.writeObject(putFile(request, socket.getInputStream()));
-                        break;
-                    case EXIT:
-                        run = false;
-                        close();
-                        break;
+                    switch (request.getInstruction()) {
+                        case CD:
+                            outputStream.writeObject(changePath(request));
+                            break;
+                        case GET:
+                            outputStream.writeObject(getFile(request, socket.getOutputStream()));
+                            break;
+                        case LS:
+                            outputStream.writeObject(getFileList(request));
+                            break;
+                        case MKDIR:
+                            outputStream.writeObject(makeDirectory(request));
+                            break;
+                        case PUT:
+                            outputStream.writeObject(putFile(request, socket.getInputStream()));
+                            break;
+                        case EXIT:
+                            connected = false;
+                            outputStream.close();
+                            inputStream.close();
+                            socket.close();
+
+                            System.out.println("Client Disconnected.");
+                            break;
+                    }
                 }
+            }
+            catch(Exception e){
+                run = false;
             }
         }
     }
