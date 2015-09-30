@@ -37,14 +37,16 @@ public class Controller implements AutoCloseable {
 
     public void run() throws IOException, ClassNotFoundException {
 
+        boolean run = true;
+
         try (final Socket socket = serverSocket.accept();
                 final ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());
                 final ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream())) {
 
             outputStream.writeObject(new PathChange(Paths.get(System.getProperty(USER_HOME))));
-            while (true) {
+            while (run) {
                 final Request request = (Request) inputStream.readObject();
-                System.err.println("Instruction: " + request.getInstruction() + ", Data: " + request.getData());
+                System.err.println("Instruction: " + request.getInstruction() + ", Data: " + request.getData()); //TODO: Why is this an error?
 
                 switch (request.getInstruction()) {
                     case CD:
@@ -61,6 +63,10 @@ public class Controller implements AutoCloseable {
                         break;
                     case PUT:
                         outputStream.writeObject(putFile(request, socket.getInputStream()));
+                        break;
+                    case EXIT:
+                        run = false;
+                        close();
                         break;
                 }
             }

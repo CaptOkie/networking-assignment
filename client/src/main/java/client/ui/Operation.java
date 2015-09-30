@@ -10,7 +10,8 @@ public enum Operation {
     MKDIR("Create a directory.", Instruction.MKDIR),
     GETDIR("Prints or sets the directory to download to.", null),
     PWD("Show the current directory path.", null),
-    HELP("Show help instructions.", null);
+    HELP("Show help instructions.", null),
+    EXIT("Closes the Connection", Instruction.EXIT);
 
     private final String desc;
     private final Instruction instruction;

@@ -48,9 +48,10 @@ public class Controller implements AutoCloseable {
     }
     
     public void run() throws ClassNotFoundException, IOException {
-        
+        boolean run = true;
+        System.out.println("Connection Successful");
         path = ((PathChange) inputStream.readObject()).getPath();
-        while (true) {
+        while (run) {
 
             Command command;
             for (command = ui.getCommand(); command == null; command = ui.getCommand()) {
@@ -73,6 +74,8 @@ public class Controller implements AutoCloseable {
                     }
                     ui.showPath(getDir);
                     break;
+                case EXIT: //marking for closure then exiting, we flow into default because we need to send to server.
+                    run = false;
                 default:
                     send(command.toRequest(path), outputStream, inputStream);
                     break;
@@ -128,6 +131,10 @@ public class Controller implements AutoCloseable {
                         break;
                 }
                 break;
+            case EXIT:
+                //do the exit
+                close();
+
         }
     }
 

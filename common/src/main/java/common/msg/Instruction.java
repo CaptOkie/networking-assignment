@@ -5,5 +5,6 @@ public enum Instruction {
     GET,
     PUT,
     CD,
-    MKDIR
+    MKDIR,
+    EXIT
 }
