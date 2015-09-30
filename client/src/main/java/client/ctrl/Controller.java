@@ -36,7 +36,9 @@ public class Controller implements AutoCloseable {
     
     public Controller() throws UnknownHostException, IOException {
         this.ui = new CommandLineInterface();
-        this.socket = new Socket("127.0.0.1", 8080);
+        String ipAddress = ui.getIPAddress();
+
+        this.socket = new Socket(ipAddress, 8080);
         this.outputStream = new ObjectOutputStream(socket.getOutputStream());
         this.inputStream = new ObjectInputStream(socket.getInputStream());
         this.fileTransfer = new FileTransfer();        

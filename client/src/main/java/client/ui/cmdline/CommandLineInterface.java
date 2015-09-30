@@ -36,7 +36,15 @@ public class CommandLineInterface implements AutoCloseable {
             return null;
         }
     }
-    
+
+    public String getIPAddress() {
+        String line = console.readLine("Connect To: > ");
+        if(line == null){
+            return "";
+        }
+
+        return line;
+    }
     public CommandLineInterface showError(final CommandLineError error) {
         console.writeLine(error.getMsg());
         return this;
