@@ -20,7 +20,6 @@ public class Client {
     		err = false;
 	    	try (final Controller controller = new Controller()) {
 	            controller.run();
-    			controller.close();
 	        }
 	    	catch (UnknownHostException e) {
 	    		err = true;
@@ -53,6 +52,8 @@ public class Client {
 	    					break;
 	    				}
 	    			} while (err);
+	    		} else {
+	    			run = false;
 	    		}
 	    	}
     	}

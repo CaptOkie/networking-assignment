@@ -12,17 +12,17 @@ public class Server {
     public static void main(final String[] args) throws IOException, ClassNotFoundException { // TODO Maybe handle these exceptions
     	console = new Console();
     	
-    	while (true) {
-	        try (final Controller controller = new Controller()) {
-	            console.writeLine("Listening");
-	            controller.run();
-	        }
-	        catch (IOException e) {
-	        	console.writeLine("IOException: " + e.getLocalizedMessage());
-	        }
-	        catch (ClassNotFoundException e) {
-	        	console.writeLine("ClassNotFoundException: " + e.getLocalizedMessage());
-	        }
-    	}
+        try (final Controller controller = new Controller()) {
+            console.writeLine("Listening");
+            controller.run();
+        }
+        catch (IOException e) {
+        	console.writeLine("IOException: " + e.getLocalizedMessage());
+        }
+        catch (ClassNotFoundException e) {
+        	console.writeLine("ClassNotFoundException: " + e.getLocalizedMessage());
+        }
+        
+        console.close();
     }
 }
