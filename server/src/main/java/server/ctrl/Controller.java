@@ -74,7 +74,7 @@ public class Controller implements AutoCloseable {
                     }
                     catch (Exception e) {
                         connected = false;
-                        System.out.println("Client Disconnected.");
+                        System.out.println("Client Disconnected: "+e.toString());
                     }
                 }
             }
