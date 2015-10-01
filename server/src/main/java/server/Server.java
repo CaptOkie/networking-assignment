@@ -2,15 +2,27 @@ package server;
 
 import java.io.IOException;
 
+import common.ui.Console;
 import server.ctrl.Controller;
 
 public class Server {
 
-    public static void main(final String[] args) throws IOException, ClassNotFoundException { // TODO Maybe handle these exceptions
+	static Console console;
 
-        System.out.println("Listening");
+    public static void main(final String[] args) throws IOException, ClassNotFoundException { // TODO Maybe handle these exceptions
+    	console = new Console();
+    	
         try (final Controller controller = new Controller()) {
+            console.writeLine("Listening");
             controller.run();
         }
+        catch (IOException e) {
+        	console.writeLine("IOException: " + e.getLocalizedMessage());
+        }
+        catch (ClassNotFoundException e) {
+        	console.writeLine("ClassNotFoundException: " + e.getLocalizedMessage());
+        }
+        
+        console.close();
     }
 }

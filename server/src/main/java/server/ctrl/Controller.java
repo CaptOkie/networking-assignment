@@ -53,37 +53,54 @@ public class Controller implements AutoCloseable {
                 System.out.println("Client Connected");
                 outputStream.writeObject(new PathChange(Paths.get(System.getProperty(USER_HOME))));
                 while (connected) {
-                    final Request request = (Request) inputStream.readObject();
+                	boolean err = false;
+                	Request req = null;
+                	try {
+                		req = (Request) inputStream.readObject();
+                	}
+                	catch (Exception e) {
+                		err = true;
+                	}
+                	if (err) {
+                        connected = false;
+                        outputStream.close();
+                        inputStream.close();
+                        socket.close();
+
+                        System.out.println("Client Disconnected.");
+                	} else {
 //                    System.out.println("Instruction: " + request.getInstruction() + ", Data: " + request.getData());
+                		final Request request = req;
 
-                    switch (request.getInstruction()) {
-                        case CD:
-                            outputStream.writeObject(changePath(request));
-                            break;
-                        case GET:
-                            outputStream.writeObject(getFile(request, socket.getOutputStream()));
-                            break;
-                        case LS:
-                            outputStream.writeObject(getFileList(request));
-                            break;
-                        case MKDIR:
-                            outputStream.writeObject(makeDirectory(request));
-                            break;
-                        case PUT:
-                            outputStream.writeObject(putFile(request, socket.getInputStream()));
-                            break;
-                        case EXIT:
-                            connected = false;
-                            outputStream.close();
-                            inputStream.close();
-                            socket.close();
-
-                            System.out.println("Client Disconnected.");
-                            break;
-                    }
+	                    switch (request.getInstruction()) {
+	                        case CD:
+	                            outputStream.writeObject(changePath(request));
+	                            break;
+	                        case GET:
+	                            outputStream.writeObject(getFile(request, socket.getOutputStream()));
+	                            break;
+	                        case LS:
+	                            outputStream.writeObject(getFileList(request));
+	                            break;
+	                        case MKDIR:
+	                            outputStream.writeObject(makeDirectory(request));
+	                            break;
+	                        case PUT:
+	                            outputStream.writeObject(putFile(request, socket.getInputStream()));
+	                            break;
+	                        case EXIT:
+	                            connected = false;
+	                            outputStream.close();
+	                            inputStream.close();
+	                            socket.close();
+	
+	                            System.out.println("Client Disconnected.");
+	                            break;
+	                    }
+                	}
                 }
             }
-            catch(Exception e){
+            catch (Exception e) {
                 run = false;
             }
         }

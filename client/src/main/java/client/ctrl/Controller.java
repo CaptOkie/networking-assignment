@@ -132,10 +132,8 @@ public class Controller implements AutoCloseable {
                         break;
                 }
                 break;
-            case EXIT:
-                //do the exit
-                close();
-
+			default:
+				break;
         }
     }
 
