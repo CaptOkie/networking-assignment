@@ -20,10 +20,9 @@ import common.msg.response.MakeDirectory;
 import common.msg.response.PathChange;
 import common.msg.response.PutStatus;
 import common.tcp.FileTransfer;
+import common.utils.Constants;
 
 public class Controller implements AutoCloseable {
-
-    private static final String USER_HOME = "user.home";
     
     private final CommandLineInterface ui;
     private final Socket socket;
@@ -36,15 +35,19 @@ public class Controller implements AutoCloseable {
     
     public Controller() throws UnknownHostException, IOException {
         this.ui = new CommandLineInterface();
-        String ipAddress = ui.getIPAddress();
-
-        this.socket = new Socket(ipAddress, 8080);
+        
+        String ipAddress;
+        for (ipAddress = ui.getIPAddress(); ipAddress == null; ipAddress = ui.getIPAddress()) {
+            ui.showError(CommandLineError.INVALID_IP_ADDRESS);
+        }
+        
+        this.socket = new Socket(ipAddress, Constants.port);
         this.outputStream = new ObjectOutputStream(socket.getOutputStream());
         this.inputStream = new ObjectInputStream(socket.getInputStream());
         this.fileTransfer = new FileTransfer();        
 
         this.path = null;
-        this.getDir = Paths.get(System.getProperty(USER_HOME));
+        this.getDir = Paths.get(System.getProperty(Constants.USER_HOME));
     }
     
     public void run() throws ClassNotFoundException, IOException {
