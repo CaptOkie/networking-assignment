@@ -33,19 +33,29 @@ public class Client {
                     if (err) {
                         do {
                             err = false;
-                            String quit = console.readLine("Would you like to quit [Y/n]? ").toLowerCase();
-                            switch (quit) {
-                                case "y":
-                                case "yes":
-                                    run = false;
-                                    break;
-                                case "n":
-                                case "no":
-                                    break;
-                                default:
-                                    err = true;
-                                    console.writeLine("Invalid input.");
-                                    break;
+                            String quit = null;
+                            try {
+                            	quit = console.readLine("Would you like to quit [Y/n]? ").toLowerCase();
+                            }
+                            catch (Exception e) {
+    	    					System.out.println("Exception: " + e.getLocalizedMessage());
+    	    					System.out.println("Quitting...");
+    	    					run = false;
+                            }
+                            if (quit != null) {
+	                            switch (quit) {
+	                                case "y":
+	                                case "yes":
+	                                    run = false;
+	                                    break;
+	                                case "n":
+	                                case "no":
+	                                    break;
+	                                default:
+	                                    err = true;
+	                                    console.writeLine("Invalid input.");
+	                                    break;
+	                            }
                             }
                         } while (err);
                     }
