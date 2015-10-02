@@ -55,7 +55,15 @@ public class Controller implements AutoCloseable {
                                 outputStream.writeObject(changePath(request));
                                 break;
                             case GET:
-                                outputStream.writeObject(getFile(request, socket.getOutputStream()));
+                                GetStatus myStatus = getFile(request, socket.getOutputStream());
+                                GetStatus clientStatus = (GetStatus) inputStream.readObject();
+                                if(clientStatus == GetStatus.SUCCESS){
+                                    System.out.println("Client Successfully Received File.");
+                                }
+                                else{
+                                    System.out.println("Client Failed to Receive File.");
+                                }
+                                outputStream.writeObject(myStatus);
                                 break;
                             case LS:
                                 outputStream.writeObject(getFileList(request));

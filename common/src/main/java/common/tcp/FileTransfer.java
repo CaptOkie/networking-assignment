@@ -8,6 +8,7 @@ import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import common.msg.response.GetStatus;
 
 /**
  * Class for transferring files between client & server
@@ -29,7 +30,7 @@ public class FileTransfer {
         }
     }
 
-    public void receive(Path path, InputStream inputStream) throws UnsupportedEncodingException, IOException, ClassNotFoundException {
+    public GetStatus receive(Path path, InputStream inputStream) throws UnsupportedEncodingException, IOException, ClassNotFoundException {
         byte[] buffer = new byte[LONG_BUFFER_SIZE];
         inputStream.read(buffer);
         ByteBuffer byteBuffer = ByteBuffer.allocate(buffer.length).put(buffer);
@@ -38,6 +39,8 @@ public class FileTransfer {
         try (OutputStream outputStream = Files.newOutputStream(path, StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE)) {
             copy(inputStream, outputStream, byteBuffer.getLong());
         }
+        //returning success
+        return GetStatus.SUCCESS;
     }
 
     private static void copy(InputStream inputStream, OutputStream outputStream, long size) throws IOException {

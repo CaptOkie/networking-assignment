@@ -98,7 +98,8 @@ public class Controller implements AutoCloseable {
                 break;
             case GET:
                 if (!request.getData().isEmpty()) {
-                    fileTransfer.receive(getDir.resolve(Paths.get(request.getData().get(0))), socket.getInputStream());
+                    //sending the success or fail status of the transfer back to the server.
+                    outputStream.writeObject(fileTransfer.receive(getDir.resolve(Paths.get(request.getData().get(0))), socket.getInputStream()));
                 }
                 final GetStatus getStatus = (GetStatus) inputStream.readObject();
                 switch (getStatus) {
