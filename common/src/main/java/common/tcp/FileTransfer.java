@@ -31,16 +31,24 @@ public class FileTransfer {
     }
 
     public GetStatus receive(Path path, InputStream inputStream) throws UnsupportedEncodingException, IOException, ClassNotFoundException {
-        byte[] buffer = new byte[LONG_BUFFER_SIZE];
+        GetStatus rc = GetStatus.SUCCESS;
+    	
+    	byte[] buffer = new byte[LONG_BUFFER_SIZE];
         inputStream.read(buffer);
         ByteBuffer byteBuffer = ByteBuffer.allocate(buffer.length).put(buffer);
         byteBuffer.flip();
 
         try (OutputStream outputStream = Files.newOutputStream(path, StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE)) {
-            copy(inputStream, outputStream, byteBuffer.getLong());
+        	long bufferSize = byteBuffer.getLong();
+        	if (bufferSize > 0) {
+        		copy(inputStream, outputStream, bufferSize);
+        	}
+        }
+        catch (Exception e) {
+        	rc = GetStatus.FAIL;
         }
         //returning success
-        return GetStatus.SUCCESS;
+        return rc;
     }
 
     private static void copy(InputStream inputStream, OutputStream outputStream, long size) throws IOException {
