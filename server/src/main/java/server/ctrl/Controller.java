@@ -53,7 +53,7 @@ public class Controller {
                                 outputStream.writeObject(changePath(request));
                                 break;
                             case GET:
-                                outputStream.writeObject(getFile(request, socket.getOutputStream()));
+                                outputStream.writeObject(getFile(request, socket.getOutputStream(), outputStream));
                                 break;
                             case LS:
                                 outputStream.writeObject(getFileList(request));
@@ -62,7 +62,7 @@ public class Controller {
                                 outputStream.writeObject(makeDirectory(request));
                                 break;
                             case PUT:
-                                outputStream.writeObject(putFile(request, socket.getInputStream()));
+                                outputStream.writeObject(putFile(request, socket.getInputStream(), outputStream));
                                 break;
                             case EXIT:
                                 connected = false;
@@ -72,7 +72,7 @@ public class Controller {
                         }
                         catch (Exception e) {
                             connected = false;
-                            System.out.println("Client Disconnected: " + e.toString());
+                            e.printStackTrace();
                         }
                     }
                 }
@@ -133,10 +133,12 @@ public class Controller {
         }
     }
 
-    private PutStatus putFile(final Request request, InputStream inputStream) {
+    private PutStatus putFile(final Request request, InputStream inputStream, final ObjectOutputStream objectOutputStream) throws IOException {
         if (request.getData().isEmpty()) {
             return PutStatus.NO_PATH;
         }
+        
+        objectOutputStream.writeObject(PutStatus.SUCCESS);
 
         try {
             fileTransfer.receive(request.getPath().resolve(Paths.get(request.getData().get(0)).getFileName()), inputStream);
@@ -147,11 +149,13 @@ public class Controller {
         return PutStatus.SUCCESS;
     }
 
-    private GetStatus getFile(final Request request, final OutputStream outputStream) {
+    private GetStatus getFile(final Request request, final OutputStream outputStream, final ObjectOutputStream objectOutputStream) throws IOException {
         if (request.getData().isEmpty()) {
             return GetStatus.NO_PATH;
         }
 
+        objectOutputStream.writeObject(GetStatus.SUCCESS);
+        
         try {
             fileTransfer.send(request.getPath().resolve(request.getData().get(0)), outputStream);
         }
