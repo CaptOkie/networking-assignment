@@ -33,7 +33,11 @@ public class Console implements AutoCloseable {
     
     @Override
     public void close() {
-        formatter.close();
-        scanner.close();
+        try {
+            formatter.close();
+        }
+        finally {
+            scanner.close();
+        }
     }
 }

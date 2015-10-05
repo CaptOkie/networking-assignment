@@ -14,6 +14,7 @@ import java.nio.file.StandardOpenOption;
 import client.ui.cmdline.Command;
 import client.ui.cmdline.CommandLineError;
 import client.ui.cmdline.CommandLineInterface;
+import client.ui.cmdline.YesOrNo;
 import common.msg.Request;
 import common.msg.response.FileList;
 import common.msg.response.GetStatus;
@@ -39,52 +40,77 @@ public class Controller implements AutoCloseable {
         this.getDir = Paths.get(System.getProperty(Constants.USER_HOME));
     }
     
-    public void run() throws Exception {
+    public void run() {
         
-        try (final Socket socket = new Socket(ui.getIPAddress(), Constants.PORT); final ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());
-                final ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream())) {
-            
-            boolean connected = true;
-            path = ((PathChange) inputStream.readObject()).getPath();
-            ui.showPath(path);
-            while (connected) {
+        boolean run = true;
+        while (run) {
+        
+            try (final Socket socket = new Socket(ui.getIPAddress(), Constants.PORT); final ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());
+                    final ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream())) {
                 
-                Command command;
-                for (command = ui.getCommand(); command == null; command = ui.getCommand()) {
-                    ui.showError(CommandLineError.UNRECOGNIZED_COMMAND);
-                }
-                
-                switch (command.getOperation()) {
-                    case HELP:
-                        ui.showHelp();
-                        break;
-                    case PWD:
-                        ui.showPath(path);
-                        break;
-                    case GETDIR:
-                        if (!command.getData().isEmpty()) {
-                            final Path change = getDir.resolve(command.getData().get(0));
-                            if (Files.isDirectory(change)) {
-                                getDir = change;
+                boolean connected = true;
+                path = ((PathChange) inputStream.readObject()).getPath();
+                ui.showPath(path);
+                while (connected) {
+                    
+                    Command command;
+                    for (command = ui.getCommand(); command == null; command = ui.getCommand()) {
+                        ui.showError(CommandLineError.UNRECOGNIZED_COMMAND);
+                    }
+                    
+                    switch (command.getOperation()) {
+                        case HELP:
+                            ui.showHelp();
+                            break;
+                        case PWD:
+                            ui.showPath(path);
+                            break;
+                        case GETDIR:
+                            if (!command.getData().isEmpty()) {
+                                final Path change = getDir.resolve(command.getData().get(0));
+                                if (Files.isDirectory(change)) {
+                                    getDir = change;
+                                }
                             }
-                        }
-                        ui.showPath(getDir);
-                        break;
-                    case EXIT: //marking for closure then exiting, we flow into default because we need to send to server.
-                        connected = false;
-                    default:
-                        send(command.toRequest(path), socket, outputStream, inputStream);
-                        break;
+                            ui.showPath(getDir);
+                            break;
+                        case EXIT: //marking for closure then exiting, we flow into default because we need to send to server.
+                            connected = false;
+                        default:
+                            send(command.toRequest(path), socket, outputStream, inputStream);
+                            break;
+                    }
                 }
             }
+            catch (UnknownHostException e) {
+                ui.showError(CommandLineError.INVALID_HOST);
+                run = askQuestion("Would you like to try again?");
+            }
+            catch (IOException | ClassNotFoundException e) {
+                ui.showError(CommandLineError.FATAL_ERROR);
+                run = askQuestion("Would you like to restart?");
+            }
         }
-        catch (UnknownHostException e) {
-            ui.showError(CommandLineError.INVALID_HOST);
-            throw e;
+    }
+    
+    private boolean askQuestion(final String question) {
+        YesOrNo yesOrNo = null;
+        for (yesOrNo = ui.getYesOrNo(question); yesOrNo == null; yesOrNo = ui.getYesOrNo(question)) {
+            ui.showError(CommandLineError.INVALID_OPTION);
         }
-        catch (IOException | ClassNotFoundException e) {
-            ui.showError(CommandLineError.FATAL_ERROR);
-            throw e;
+        switch (yesOrNo) {
+            case N:
+            case NAH:
+            case NO:
+            case NOPE:
+                return false;
+            case Y:
+            case YEAH:
+            case YES:
+            case YUP:
+                return true;
+            default:
+                throw new RuntimeException("Unrecognized option");
         }
     }
     

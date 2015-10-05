@@ -7,7 +7,8 @@ public enum CommandLineError {
     ARGUMENT_MISSING("Argument required"),
     DOWNLOAD_FAILED("File download failed"),
     UPLOAD_FAILED("File upload failed"),
-    FATAL_ERROR("Fatal error occurred...shutting down");
+    FATAL_ERROR("Fatal error occurred...shutting down"),
+    INVALID_OPTION("Invalid option");
 
     private final String msg;
 

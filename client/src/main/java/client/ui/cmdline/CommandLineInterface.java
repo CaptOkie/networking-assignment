@@ -41,6 +41,17 @@ public class CommandLineInterface implements AutoCloseable {
         final String line = console.readLine("Connect To: > ");
         return line == null ? "" : line;
     }
+    
+    public YesOrNo getYesOrNo(final String question) {
+        final String line = console.readLine(question + " [Y/n] > ");
+        try {
+            return YesOrNo.valueOf(line.toUpperCase());
+        }
+        catch (final IllegalArgumentException e) {
+            return null;
+        }
+    }
+    
     public CommandLineInterface showError(final CommandLineError error) {
         console.writeLine(error.getMsg());
         return this;
