@@ -106,6 +106,8 @@ public class Controller implements AutoCloseable {
                     case NO_PATH:
                         ui.showError(CommandLineError.ARGUMENT_MISSING);
                         break;
+                    case FAIL:
+                        ui.showError(CommandLineError.DOWNLOAD_FAILED);
                     case SUCCESS:
                         break;
                 }
