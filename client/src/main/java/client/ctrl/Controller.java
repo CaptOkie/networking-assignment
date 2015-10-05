@@ -40,6 +40,9 @@ public class Controller implements AutoCloseable {
         this.getDir = Paths.get(System.getProperty(Constants.USER_HOME));
     }
     
+    /**
+     * Runs the client
+     */
     public void run() {
         
         boolean run = true;
@@ -93,6 +96,11 @@ public class Controller implements AutoCloseable {
         }
     }
     
+    /**
+     * Asks a yes or no question
+     * @param question The question to ask
+     * @return true if yes, false otherwise
+     */
     private boolean askQuestion(final String question) {
         YesOrNo yesOrNo = null;
         for (yesOrNo = ui.getYesOrNo(question); yesOrNo == null; yesOrNo = ui.getYesOrNo(question)) {
@@ -114,6 +122,15 @@ public class Controller implements AutoCloseable {
         }
     }
     
+    /**
+     * Sends a message to the server
+     * @param request request to send
+     * @param socket socket on which to send
+     * @param outputStream object stream to send messages
+     * @param inputStream object stream to receive messages
+     * @throws ClassNotFoundException
+     * @throws IOException
+     */
     private void send(final Request request, final Socket socket, final ObjectOutputStream outputStream, final ObjectInputStream inputStream) throws ClassNotFoundException, IOException {
         
         outputStream.writeObject(request);
@@ -140,12 +157,27 @@ public class Controller implements AutoCloseable {
         }
     }
 
+    /**
+     * Processes the change directory request
+     * @param inputStream object stream on which it receives messages
+     * @throws ClassNotFoundException
+     * @throws IOException
+     */
     private void cd(final ObjectInputStream inputStream) throws ClassNotFoundException, IOException {
         final PathChange change = (PathChange) inputStream.readObject();
         path = change.getPath();
         ui.showPath(path);
     }
     
+    /**
+     * Gets a file from the server
+     * @param request the request that was sent
+     * @param socket the current connection
+     * @param inputStream object stream on which messages are received
+     * @param outputStream object stream on which it sends messages
+     * @throws ClassNotFoundException
+     * @throws IOException
+     */
     private void get(final Request request, final Socket socket, final ObjectInputStream inputStream, ObjectOutputStream outputStream) throws ClassNotFoundException, IOException {
         switch ((GetStatus) inputStream.readObject()) {
             case SUCCESS:
@@ -180,11 +212,23 @@ public class Controller implements AutoCloseable {
         }                
     }
     
+    /**
+     * Process the list directory request
+     * @param inputStream object stream on which messages are received
+     * @throws ClassNotFoundException
+     * @throws IOException
+     */
     private void ls(final ObjectInputStream inputStream) throws ClassNotFoundException, IOException {
         final FileList fileList = (FileList) inputStream.readObject();
         ui.showFiles(fileList.getFiles());
     }
     
+    /**
+     * Process the make directory request
+     * @param inputStream object stream on which messages are received
+     * @throws ClassNotFoundException
+     * @throws IOException
+     */
     private void mkdir(final ObjectInputStream inputStream) throws ClassNotFoundException, IOException {
         final MakeDirectory makeDirectory = (MakeDirectory) inputStream.readObject();
         if (!makeDirectory.isSuccess()) {
@@ -192,6 +236,14 @@ public class Controller implements AutoCloseable {
         }
     }
     
+    /**
+     * Puts a file on the server
+     * @param request the request from the client
+     * @param socket the current connection
+     * @param inputStream object stream on which messages are received
+     * @throws ClassNotFoundException
+     * @throws IOException
+     */
     private void put(final Request request, final Socket socket, final ObjectInputStream inputStream) throws ClassNotFoundException, IOException {
         switch ((PutStatus) inputStream.readObject()) {
             case FAIL:

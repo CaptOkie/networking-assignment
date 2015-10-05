@@ -8,6 +8,10 @@ import java.util.List;
 import client.ui.Operation;
 import common.msg.Request;
 
+/**
+ * Command from the client 
+ *
+ */
 public class Command {
 
     private Operation operation;

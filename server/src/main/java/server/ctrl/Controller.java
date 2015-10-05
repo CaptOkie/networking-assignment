@@ -34,6 +34,9 @@ public class Controller {
         fileTransfer = new FileTransfer();
     }
 
+    /**
+     * Starts the server
+     */
     public void run() {
         try (final ServerSocket serverSocket = new ServerSocket(Constants.PORT); final Console console = new Console()) {
             
@@ -91,6 +94,11 @@ public class Controller {
         }
     }
 
+    /**
+     * Changes the current path.
+     * @param request the request from the client
+     * @return the new path
+     */
     private PathChange changePath(final Request request) {
 
         final Path path = request.getPath();
@@ -105,6 +113,11 @@ public class Controller {
         return new PathChange(path);
     }
 
+    /**
+     * Get the list of files in a directory
+     * @param request the request from the client
+     * @return the list of files
+     */
     private FileList getFileList(final Request request) {
 
         final Path path = request.getPath();
@@ -121,6 +134,11 @@ public class Controller {
         return new FileList(files);
     }
 
+    /**
+     * Makes a directory
+     * @param request the request from the client
+     * @return
+     */
     private MakeDirectory makeDirectory(final Request request) {
 
         final Path path = request.getPath();
@@ -138,7 +156,14 @@ public class Controller {
         }
     }
 
-    private PutStatus putFile(final Request request, InputStream inputStream, final ObjectOutputStream objectOutputStream) throws IOException {
+    /**
+     * Puts a file onto the server
+     * @param request the request from the client
+     * @param inputStream the stream on which the file is received
+     * @param objectOutputStream the stream for sending messages
+     * @return Status of the put
+     */
+    private PutStatus putFile(final Request request, InputStream inputStream, final ObjectOutputStream objectOutputStream) {
         if (request.getData().isEmpty()) {
             return PutStatus.NO_PATH;
         }
@@ -154,14 +179,23 @@ public class Controller {
         return PutStatus.SUCCESS;
     }
 
-    private GetStatus getFile(final Request request, final OutputStream outputStream, final ObjectOutputStream objectOutputStream, ObjectInputStream inputStream) throws ClassNotFoundException {
+    /**
+     * Get the file from the server
+     * @param request the request from the client
+     * @param outputStream the stream that is written to
+     * @param objectOutputStream the stream that sends messages
+     * @param objectInputStream the stream that receives messages
+     * @return The status of the get
+     * @throws ClassNotFoundException
+     */
+    private GetStatus getFile(final Request request, final OutputStream outputStream, final ObjectOutputStream objectOutputStream, ObjectInputStream objectInputStream) throws ClassNotFoundException {
         if (request.getData().isEmpty()) {
             return GetStatus.NO_PATH;
         }
 
         try {
             objectOutputStream.writeObject(GetStatus.SUCCESS);
-            switch ((GetStatus) inputStream.readObject()) {
+            switch ((GetStatus) objectInputStream.readObject()) {
                 case SUCCESS:
                     fileTransfer.send(request.getPath().resolve(request.getData().get(0)), outputStream);
                     break;

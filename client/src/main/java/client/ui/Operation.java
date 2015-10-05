@@ -2,6 +2,10 @@ package client.ui;
 
 import common.msg.Instruction;
 
+/**
+ * All the commands the client can make
+ *
+ */
 public enum Operation {
     LS("List all files in the directory.", Instruction.LS),
     GET("Get the file.", Instruction.GET),

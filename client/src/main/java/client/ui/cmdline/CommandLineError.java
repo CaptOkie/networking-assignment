@@ -1,5 +1,9 @@
 package client.ui.cmdline;
 
+/**
+ * All the erros that can be shown at the command line 
+ *
+ */
 public enum CommandLineError {
     INVALID_HOST("Invalid host"),
     UNRECOGNIZED_COMMAND("Unrecognized command"),
