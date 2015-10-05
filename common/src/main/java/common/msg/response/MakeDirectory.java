@@ -8,10 +8,16 @@ public class MakeDirectory implements Serializable {
     
     private final boolean success;
     
+    /**
+     * @param success <code>true</code> if the directory was made, <code>false</code> otherwise.
+     */
     public MakeDirectory(final boolean success) {
         this.success = success;
     }
     
+    /**
+     * @return <code>true</code> if the directory was made, <code>false</code> otherwise.
+     */
     public boolean isSuccess() {
         return success;
     }

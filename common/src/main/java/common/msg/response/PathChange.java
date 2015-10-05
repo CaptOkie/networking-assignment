@@ -10,10 +10,16 @@ public class PathChange implements Serializable {
 
     private String path;
 
+    /**
+     * @param path The path to set as the change.
+     */
     public PathChange(final Path path) {
         this.path = path.toString();
     }
 
+    /**
+     * @return The path in the {@link PathChange}.
+     */
     public Path getPath() {
         return Paths.get(path);
     }

@@ -43,6 +43,6 @@ public class Command {
             return new Request(path, getOperation().getInstruction(), getData());
         }
 
-        throw new CommandToRequestException("Cannot convert with the Operation " + getOperation());
+        throw new RuntimeException("Cannot convert the Operation " + getOperation());
     }
 }

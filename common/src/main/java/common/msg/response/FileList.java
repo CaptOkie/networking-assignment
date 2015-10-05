@@ -11,6 +11,9 @@ public class FileList implements Serializable {
     
     private SortedSet<String> files;
     
+    /**
+     * @param files All the files to list.
+     */
     public FileList(final List<? extends String> files) {
         this.files = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
         this.files.add(".");
@@ -18,6 +21,9 @@ public class FileList implements Serializable {
         this.files.addAll(files);
     }
     
+    /**
+     * @return The ordered set of files.
+     */
     public SortedSet<String> getFiles() {
         return files;
     }
