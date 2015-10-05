@@ -41,7 +41,7 @@ public class Controller implements AutoCloseable {
             ui.showError(CommandLineError.INVALID_IP_ADDRESS);
         }
         
-        this.socket = new Socket(ipAddress, Constants.port);
+        this.socket = new Socket(ipAddress, Constants.PORT);
         this.outputStream = new ObjectOutputStream(socket.getOutputStream());
         this.inputStream = new ObjectInputStream(socket.getInputStream());
         this.fileTransfer = new FileTransfer();        
