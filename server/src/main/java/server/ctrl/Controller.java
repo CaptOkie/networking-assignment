@@ -151,7 +151,7 @@ public class Controller {
         try {
             fileTransfer.receive(request.getPath().resolve(Paths.get(request.getData().get(0)).getFileName()), inputStream);
         }
-        catch (ClassNotFoundException | IOException e) {
+        catch (IOException e) {
             return PutStatus.FAIL;
         }
         return PutStatus.SUCCESS;

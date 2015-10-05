@@ -8,8 +8,8 @@ import common.ui.Console;
 
 public class Client {
 
-    public static void main(final String[] args) throws UnknownHostException, IOException, ClassNotFoundException { // TODO Maybe handle these exceptions
-
+    public static void main(final String[] args) {
+        
         try (final Console console = new Console()) {
             boolean run = true;
             while (run) {
@@ -24,10 +24,6 @@ public class Client {
                 catch (IOException e) {
                     err = true;
                     console.writeLine("IOException: " + e.getLocalizedMessage());
-                }
-                catch (ClassNotFoundException e) {
-                    err = true;
-                    console.writeLine("ClassNotFoundException: " + e.getLocalizedMessage());
                 }
                 finally {
                     if (err) {

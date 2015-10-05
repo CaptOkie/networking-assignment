@@ -1,7 +1,7 @@
 package client.ui.cmdline;
 
 public enum CommandLineError {
-    INVALID_IP_ADDRESS("Invalid IP address"),
+    INVALID_HOST("Invalid host"),
     UNRECOGNIZED_COMMAND("Unrecognized command"),
     MAKE_DIR_FAILED("Unable to create the directory"),
     ARGUMENT_MISSING("Argument required"),

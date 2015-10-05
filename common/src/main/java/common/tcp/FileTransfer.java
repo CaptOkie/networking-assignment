@@ -3,12 +3,10 @@ package common.tcp;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import common.msg.response.GetStatus;
 
 /**
  * Class for transferring files between client & server
@@ -30,10 +28,9 @@ public class FileTransfer {
         }
     }
 
-    public GetStatus receive(Path path, InputStream inputStream) throws UnsupportedEncodingException, IOException, ClassNotFoundException {
-        GetStatus rc = GetStatus.SUCCESS;
-    	
-    	byte[] buffer = new byte[LONG_BUFFER_SIZE];
+    public void receive(Path path, InputStream inputStream) throws IOException {
+
+        byte[] buffer = new byte[LONG_BUFFER_SIZE];
         inputStream.read(buffer);
         ByteBuffer byteBuffer = ByteBuffer.allocate(buffer.length).put(buffer);
         byteBuffer.flip();
@@ -44,11 +41,6 @@ public class FileTransfer {
         		copy(inputStream, outputStream, bufferSize);
         	}
         }
-        catch (Exception e) {
-        	rc = GetStatus.FAIL;
-        }
-        //returning success
-        return rc;
     }
 
     private static void copy(InputStream inputStream, OutputStream outputStream, long size) throws IOException {

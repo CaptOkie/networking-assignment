@@ -5,15 +5,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import client.ui.Operation;
 import common.ui.Console;
 
 public class CommandLineInterface implements AutoCloseable {
 
-    private static final Pattern IP_PATTERN = Pattern.compile("\\A\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\z");
-    
     private final Console console;
     
     public CommandLineInterface() {
@@ -27,7 +24,7 @@ public class CommandLineInterface implements AutoCloseable {
             return null;
         }
         
-        final List<String> items = Arrays.asList(line.split("\\s+"));
+        final List<String> items = Arrays.asList(line.split("\\s+", 2));
         if (items.size() <= 0) {
             return null;
         }
@@ -41,12 +38,8 @@ public class CommandLineInterface implements AutoCloseable {
     }
 
     public String getIPAddress() {
-        String line = console.readLine("Connect To: > ");
-        if(line == null || !IP_PATTERN.matcher(line).matches()){
-            return null;
-        }
-
-        return line;
+        final String line = console.readLine("Connect To: > ");
+        return line == null ? "" : line;
     }
     public CommandLineInterface showError(final CommandLineError error) {
         console.writeLine(error.getMsg());
