@@ -18,6 +18,7 @@ public class FileTransfer {
     private static final int LONG_BUFFER_SIZE = Long.SIZE / Byte.SIZE;
 
     public void send(Path path, OutputStream outputStream) throws IOException {
+        
         final long size = Files.size(path);
         byte[] bytes = ByteBuffer.allocate(LONG_BUFFER_SIZE).putLong(size).array();
         outputStream.write(bytes);
@@ -28,18 +29,16 @@ public class FileTransfer {
         }
     }
 
-    public void receive(Path path, InputStream inputStream) throws IOException {
+    public void receive(InputStream inputStream, OutputStream outputStream) throws IOException {
 
         byte[] buffer = new byte[LONG_BUFFER_SIZE];
         inputStream.read(buffer);
         ByteBuffer byteBuffer = ByteBuffer.allocate(buffer.length).put(buffer);
         byteBuffer.flip();
 
-        try (OutputStream outputStream = Files.newOutputStream(path, StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE)) {
-        	long bufferSize = byteBuffer.getLong();
-        	if (bufferSize > 0) {
-        		copy(inputStream, outputStream, bufferSize);
-        	}
+        long bufferSize = byteBuffer.getLong();
+        if (bufferSize > 0) {
+            copy(inputStream, outputStream, bufferSize);
         }
     }
 

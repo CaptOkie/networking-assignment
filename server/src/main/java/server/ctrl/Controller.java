@@ -11,6 +11,7 @@ import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -38,12 +39,13 @@ public class Controller {
             
             boolean run = true;
             while (run) {
+                console.writeLine("Listening...");
                 
                 try (final Socket socket = serverSocket.accept();
                         final ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());
                         final ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream())) {
 
-                    System.out.println("Client Connected");
+                    console.writeLine("Client Connected");
                     outputStream.writeObject(new PathChange(Paths.get(System.getProperty(Constants.USER_HOME))));
 
                     boolean connected = true;
@@ -56,7 +58,7 @@ public class Controller {
                                 outputStream.writeObject(changePath(request));
                                 break;
                             case GET:
-                                outputStream.writeObject(getFile(request, socket.getOutputStream(), outputStream));
+                                outputStream.writeObject(getFile(request, socket.getOutputStream(), outputStream, inputStream));
                                 break;
                             case LS:
                                 outputStream.writeObject(getFileList(request));
@@ -74,8 +76,8 @@ public class Controller {
                             }
                         }
                         catch (Exception e) {
-                            connected = false;
                             e.printStackTrace(System.err);
+                            connected = false;
                         }
                     }
                 }
@@ -141,10 +143,10 @@ public class Controller {
             return PutStatus.NO_PATH;
         }
         
-        objectOutputStream.writeObject(PutStatus.SUCCESS);
 
-        try {
-            fileTransfer.receive(request.getPath().resolve(Paths.get(request.getData().get(0)).getFileName()), inputStream);
+        try (OutputStream outputStream = Files.newOutputStream(request.getPath().resolve(Paths.get(request.getData().get(0)).getFileName()), StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE)) { 
+            objectOutputStream.writeObject(PutStatus.SUCCESS);
+            fileTransfer.receive(inputStream, outputStream);
         }
         catch (IOException e) {
             return PutStatus.FAIL;
@@ -152,15 +154,20 @@ public class Controller {
         return PutStatus.SUCCESS;
     }
 
-    private GetStatus getFile(final Request request, final OutputStream outputStream, final ObjectOutputStream objectOutputStream) throws IOException {
+    private GetStatus getFile(final Request request, final OutputStream outputStream, final ObjectOutputStream objectOutputStream, ObjectInputStream inputStream) throws ClassNotFoundException {
         if (request.getData().isEmpty()) {
             return GetStatus.NO_PATH;
         }
 
-        objectOutputStream.writeObject(GetStatus.SUCCESS);
-        
         try {
-            fileTransfer.send(request.getPath().resolve(request.getData().get(0)), outputStream);
+            objectOutputStream.writeObject(GetStatus.SUCCESS);
+            switch ((GetStatus) inputStream.readObject()) {
+                case SUCCESS:
+                    fileTransfer.send(request.getPath().resolve(request.getData().get(0)), outputStream);
+                    break;
+                default:
+                    return GetStatus.FAIL;
+            }
         }
         catch (IOException e) {
             return GetStatus.FAIL;

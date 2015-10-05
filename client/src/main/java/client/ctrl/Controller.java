@@ -3,11 +3,13 @@ package client.ctrl;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 
 import client.ui.cmdline.Command;
 import client.ui.cmdline.CommandLineError;
@@ -37,7 +39,7 @@ public class Controller implements AutoCloseable {
         this.getDir = Paths.get(System.getProperty(Constants.USER_HOME));
     }
     
-    public void run() {
+    public void run() throws Exception {
         
         try (final Socket socket = new Socket(ui.getIPAddress(), Constants.PORT); final ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());
                 final ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream())) {
@@ -62,7 +64,7 @@ public class Controller implements AutoCloseable {
                     case GETDIR:
                         if (!command.getData().isEmpty()) {
                             final Path change = getDir.resolve(command.getData().get(0));
-                            if (Files.isDirectory(getDir)) {
+                            if (Files.isDirectory(change)) {
                                 getDir = change;
                             }
                         }
@@ -78,9 +80,11 @@ public class Controller implements AutoCloseable {
         }
         catch (UnknownHostException e) {
             ui.showError(CommandLineError.INVALID_HOST);
+            throw e;
         }
         catch (IOException | ClassNotFoundException e) {
             ui.showError(CommandLineError.FATAL_ERROR);
+            throw e;
         }
     }
     
@@ -92,7 +96,7 @@ public class Controller implements AutoCloseable {
                 cd(inputStream);
                 break;
             case GET:
-                get(request, socket, inputStream);
+                get(request, socket, inputStream, outputStream);
                 break;
             case LS:
                 ls(inputStream);
@@ -116,14 +120,20 @@ public class Controller implements AutoCloseable {
         ui.showPath(path);
     }
     
-    private void get(final Request request, final Socket socket, final ObjectInputStream inputStream) throws ClassNotFoundException, IOException {
+    private void get(final Request request, final Socket socket, final ObjectInputStream inputStream, ObjectOutputStream outputStream) throws ClassNotFoundException, IOException {
         switch ((GetStatus) inputStream.readObject()) {
             case SUCCESS:
                 if (!request.getData().isEmpty()) {
-                    try {
-                        fileTransfer.receive(getDir.resolve(Paths.get(request.getData().get(0))), socket.getInputStream());
+                    try (OutputStream file = Files.newOutputStream(getDir.resolve(Paths.get(request.getData().get(0))), StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE)) {
+                        outputStream.writeObject(GetStatus.SUCCESS);
+                        fileTransfer.receive(socket.getInputStream(), file);
                     }
-                    catch (IOException e) {}
+                    catch (IOException e) {
+                        outputStream.writeObject(GetStatus.FAIL);
+                    }
+                }
+                else {
+                    outputStream.writeObject(GetStatus.FAIL);
                 }
                 switch ((GetStatus) inputStream.readObject()) {
                     case NO_PATH:

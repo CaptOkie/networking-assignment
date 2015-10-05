@@ -1,7 +1,5 @@
 package client;
 
-import java.io.IOException;
-
 import client.ctrl.Controller;
 import common.ui.Console;
 
@@ -16,9 +14,9 @@ public class Client {
                 try (final Controller controller = new Controller()) {
                     controller.run();
                 }
-                catch (IOException e) {
+                catch (Exception e) {
                     err = true;
-                    console.writeLine("IOException: " + e.getLocalizedMessage());
+                    console.writeLine(e.getLocalizedMessage());
                 }
                 finally {
                     if (err) {
