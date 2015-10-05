@@ -53,17 +53,7 @@ public class Controller {
                                 outputStream.writeObject(changePath(request));
                                 break;
                             case GET:
-                                GetStatus myStatus = getFile(request, socket.getOutputStream());
-                                if (myStatus == GetStatus.SUCCESS) {
-                                    GetStatus clientStatus = (GetStatus) inputStream.readObject();
-                                    if (clientStatus == GetStatus.SUCCESS) {
-                                        System.out.println("Client Successfully Received File.");
-                                    }
-                                    else {
-                                        System.out.println("Client Failed to Receive File.");
-                                    }
-                                }
-                                outputStream.writeObject(myStatus);
+                                outputStream.writeObject(getFile(request, socket.getOutputStream()));
                                 break;
                             case LS:
                                 outputStream.writeObject(getFileList(request));
