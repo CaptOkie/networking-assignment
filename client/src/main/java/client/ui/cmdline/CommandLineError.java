@@ -6,7 +6,8 @@ public enum CommandLineError {
     MAKE_DIR_FAILED("Unable to create the directory"),
     ARGUMENT_MISSING("Argument required"),
     DOWNLOAD_FAILED("File download failed"),
-    UPLOAD_FAILED("File upload failed");
+    UPLOAD_FAILED("File upload failed"),
+    FATAL_ERROR("Fatal error occurred...shutting down");
 
     private final String msg;
 

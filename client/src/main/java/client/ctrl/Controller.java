@@ -42,10 +42,10 @@ public class Controller implements AutoCloseable {
         try (final Socket socket = new Socket(ui.getIPAddress(), Constants.PORT); final ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());
                 final ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream())) {
             
-            boolean run = true;
+            boolean connected = true;
             path = ((PathChange) inputStream.readObject()).getPath();
             ui.showPath(path);
-            while (run) {
+            while (connected) {
                 
                 Command command;
                 for (command = ui.getCommand(); command == null; command = ui.getCommand()) {
@@ -69,7 +69,7 @@ public class Controller implements AutoCloseable {
                         ui.showPath(getDir);
                         break;
                     case EXIT: //marking for closure then exiting, we flow into default because we need to send to server.
-                        run = false;
+                        connected = false;
                     default:
                         send(command.toRequest(path), socket, outputStream, inputStream);
                         break;
@@ -80,7 +80,7 @@ public class Controller implements AutoCloseable {
             ui.showError(CommandLineError.INVALID_HOST);
         }
         catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace(); // TODO
+            ui.showError(CommandLineError.FATAL_ERROR);
         }
     }
     
