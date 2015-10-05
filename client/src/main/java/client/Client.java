@@ -1,7 +1,6 @@
 package client;
 
 import java.io.IOException;
-import java.net.UnknownHostException;
 
 import client.ctrl.Controller;
 import common.ui.Console;
@@ -16,10 +15,6 @@ public class Client {
                 boolean err = false;
                 try (final Controller controller = new Controller()) {
                     controller.run();
-                }
-                catch (UnknownHostException e) {
-                    err = true;
-                    console.writeLine("UnknownHostException: " + e.getLocalizedMessage());
                 }
                 catch (IOException e) {
                     err = true;

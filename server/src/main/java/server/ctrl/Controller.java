@@ -22,6 +22,7 @@ import common.msg.response.MakeDirectory;
 import common.msg.response.PathChange;
 import common.msg.response.PutStatus;
 import common.tcp.FileTransfer;
+import common.ui.Console;
 import common.utils.Constants;
 
 public class Controller {
@@ -33,9 +34,11 @@ public class Controller {
     }
 
     public void run() {
-        try (final ServerSocket serverSocket = new ServerSocket(Constants.PORT)) {
+        try (final ServerSocket serverSocket = new ServerSocket(Constants.PORT); final Console console = new Console()) {
+            
             boolean run = true;
             while (run) {
+                
                 try (final Socket socket = serverSocket.accept();
                         final ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());
                         final ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream())) {
@@ -66,13 +69,13 @@ public class Controller {
                                 break;
                             case EXIT:
                                 connected = false;
-                                System.out.println("Client Disconnected.");
+                                console.writeLine("Client Disconnected.");
                                 break;
                             }
                         }
                         catch (Exception e) {
                             connected = false;
-                            e.printStackTrace();
+                            e.printStackTrace(System.err);
                         }
                     }
                 }

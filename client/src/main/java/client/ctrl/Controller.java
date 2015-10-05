@@ -89,75 +89,19 @@ public class Controller implements AutoCloseable {
         outputStream.writeObject(request);
         switch (request.getInstruction()) {
             case CD:
-                final PathChange change = (PathChange) inputStream.readObject();
-                path = change.getPath();
-                ui.showPath(path);
+                cd(inputStream);
                 break;
             case GET:
-                switch ((GetStatus) inputStream.readObject()) {
-                    case SUCCESS:
-                        if (!request.getData().isEmpty()) {
-                            try {
-                                fileTransfer.receive(getDir.resolve(Paths.get(request.getData().get(0))), socket.getInputStream());
-                            }
-                            catch (IOException e) {}
-                        }
-                        switch ((GetStatus) inputStream.readObject()) {
-                            case NO_PATH:
-                                ui.showError(CommandLineError.ARGUMENT_MISSING);
-                                break;
-                            case FAIL:
-                                ui.showError(CommandLineError.DOWNLOAD_FAILED);
-                            case SUCCESS:
-                                break;
-                        }
-                        break;
-                    case FAIL:
-                        ui.showError(CommandLineError.DOWNLOAD_FAILED);
-                        break;
-                    case NO_PATH:
-                        ui.showError(CommandLineError.ARGUMENT_MISSING);
-                        break;
-                }                
+                get(request, socket, inputStream);
                 break;
             case LS:
-                final FileList fileList = (FileList) inputStream.readObject();
-                ui.showFiles(fileList.getFiles());
+                ls(inputStream);
                 break;
             case MKDIR:
-                final MakeDirectory makeDirectory = (MakeDirectory) inputStream.readObject();
-                if (!makeDirectory.isSuccess()) {
-                    ui.showError(CommandLineError.MAKE_DIR_FAILED);
-                }
+                mkdir(inputStream);
                 break;
             case PUT:
-                switch ((PutStatus) inputStream.readObject()) {
-                    case FAIL:
-                        ui.showError(CommandLineError.UPLOAD_FAILED);
-                        break;
-                    case NO_PATH:
-                        ui.showError(CommandLineError.ARGUMENT_MISSING);
-                        break;
-                    case SUCCESS:
-                        if (!request.getData().isEmpty()) {
-                            try {
-                                fileTransfer.send(Paths.get(request.getData().get(0)), socket.getOutputStream());
-                            }
-                            catch (IOException e) {
-                            }
-                        }
-                        switch((PutStatus) inputStream.readObject()) {
-                            case NO_PATH:
-                                ui.showError(CommandLineError.ARGUMENT_MISSING);
-                                break;
-                            case FAIL:
-                                ui.showError(CommandLineError.UPLOAD_FAILED);
-                                break;
-                            case SUCCESS:
-                                break;
-                        }
-                        break;
-                }
+                put(request, socket, inputStream);
                 break;
             case EXIT:
                 break;
@@ -166,6 +110,82 @@ public class Controller implements AutoCloseable {
         }
     }
 
+    private void cd(final ObjectInputStream inputStream) throws ClassNotFoundException, IOException {
+        final PathChange change = (PathChange) inputStream.readObject();
+        path = change.getPath();
+        ui.showPath(path);
+    }
+    
+    private void get(final Request request, final Socket socket, final ObjectInputStream inputStream) throws ClassNotFoundException, IOException {
+        switch ((GetStatus) inputStream.readObject()) {
+            case SUCCESS:
+                if (!request.getData().isEmpty()) {
+                    try {
+                        fileTransfer.receive(getDir.resolve(Paths.get(request.getData().get(0))), socket.getInputStream());
+                    }
+                    catch (IOException e) {}
+                }
+                switch ((GetStatus) inputStream.readObject()) {
+                    case NO_PATH:
+                        ui.showError(CommandLineError.ARGUMENT_MISSING);
+                        break;
+                    case FAIL:
+                        ui.showError(CommandLineError.DOWNLOAD_FAILED);
+                    case SUCCESS:
+                        break;
+                }
+                break;
+            case FAIL:
+                ui.showError(CommandLineError.DOWNLOAD_FAILED);
+                break;
+            case NO_PATH:
+                ui.showError(CommandLineError.ARGUMENT_MISSING);
+                break;
+        }                
+    }
+    
+    private void ls(final ObjectInputStream inputStream) throws ClassNotFoundException, IOException {
+        final FileList fileList = (FileList) inputStream.readObject();
+        ui.showFiles(fileList.getFiles());
+    }
+    
+    private void mkdir(final ObjectInputStream inputStream) throws ClassNotFoundException, IOException {
+        final MakeDirectory makeDirectory = (MakeDirectory) inputStream.readObject();
+        if (!makeDirectory.isSuccess()) {
+            ui.showError(CommandLineError.MAKE_DIR_FAILED);
+        }
+    }
+    
+    private void put(final Request request, final Socket socket, final ObjectInputStream inputStream) throws ClassNotFoundException, IOException {
+        switch ((PutStatus) inputStream.readObject()) {
+            case FAIL:
+                ui.showError(CommandLineError.UPLOAD_FAILED);
+                break;
+            case NO_PATH:
+                ui.showError(CommandLineError.ARGUMENT_MISSING);
+                break;
+            case SUCCESS:
+                if (!request.getData().isEmpty()) {
+                    try {
+                        fileTransfer.send(Paths.get(request.getData().get(0)), socket.getOutputStream());
+                    }
+                    catch (IOException e) {
+                    }
+                }
+                switch((PutStatus) inputStream.readObject()) {
+                    case NO_PATH:
+                        ui.showError(CommandLineError.ARGUMENT_MISSING);
+                        break;
+                    case FAIL:
+                        ui.showError(CommandLineError.UPLOAD_FAILED);
+                        break;
+                    case SUCCESS:
+                        break;
+                }
+                break;
+        }
+    }
+    
     @Override
     public void close() throws IOException {
         ui.close();
